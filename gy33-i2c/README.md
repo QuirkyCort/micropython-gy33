@@ -80,10 +80,14 @@ If anyone manage to find out more, do share.
 LED Setting must be a value between 0 to 10 (0x0A); the higher the value, the lower the brightness.
 When LED Setting is 10 (0x0A), the LED will be off.
 
+This setting isn't saved on power off and will need to be set again each time.
+
 ### White balance calibration
 
-Appears to trigger a white balance calibration.
+Trigger a white balance calibration.
 The calibration result will be saved, and will be reloaded upon power on.
+
+This calibration affects the processed RGB values and the Color value.
 
 You should place the GY-33 in front of a white object before sending this command.
 

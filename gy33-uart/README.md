@@ -62,7 +62,7 @@ B = (0x00<<8) | 0x4c = 76
 C = (0x05<<8) | 0x05 = 1285
 ```
 
-## Brightness, Color temperature, Color (0x25)
+## Lux, Color temperature, Color (0x25)
 
 | Data byte | Description |
 | --- | --- |
@@ -127,8 +127,8 @@ B = 0x4C = 76
 | --- | --- |
 | 0 | I2C Address |
 
-Returns the I2C address for I2C mode.
-It defaults to 0x5A, but this can be changed.
+Returns the 8-bit I2C address for I2C mode.
+The default 7-bit address is 0x5A, so the default 8-bit address should be 0xB4.
 
 ### Example
 
@@ -153,7 +153,7 @@ See below for the different types of commands it can accept.
 
 There are 8 types of commands.
 
-* UART Output Configuration
+* Output Configuration
 * LED Setting
 * Save LED Setting
 * Query
@@ -166,7 +166,7 @@ There are 8 types of commands.
 
 The checksum byte is calculated by summing all the previous bytes (byte 0 and 1), and taking only the lower 8 bits.
 
-## UART Output Configuration
+## Output Configuration
 
 Header = 0xA5
 
@@ -174,7 +174,7 @@ Header = 0xA5
 
 | Bit | Meaning |
 | --- | --- |
-| 7 | 1: After power-on, output according to the last output configuration, 0: No automatic output |
+| 7 | Must be 1 |
 | 6 | Must be 0 |
 | 5 | Must be 0 |
 | 4 | Must be 0 |
@@ -182,6 +182,8 @@ Header = 0xA5
 | 2 | 1: Continuous output of Raw RGBC values, 0: No output |
 | 1 | 1: Continuous output of Brightness, Color temperature, Color values, 0: No output |
 | 0 | 1: Continuous output of Processed RGB values, 0: No output |
+
+The chinese documentation implies that bit 7 is to save the settings across a power cycle, but from my tests, it seems bit 7 must always be set or you will not get any continuous output.
 
 ### Example
 
@@ -319,7 +321,7 @@ Sets the I2C address to 0x5A
 
 ## Set Integration Time
 
-Header = 0xAA
+Header = 0xA5
 
 ### Command Byte
 
