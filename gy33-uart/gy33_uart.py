@@ -1,4 +1,4 @@
-import struct
+import time
 
 TYPE_RAW = 0x15
 TYPE_LCC = 0x25
@@ -29,12 +29,17 @@ class GY33_UART:
             [439, 5838]
         ]
 
-    def read(self, wait=False):
+    def read(self, wait=False, timeout=1000):
+        start = time.ticks_ms()
         while self.uart.any() or wait:
+            if wait and time.ticks_diff(time.ticks_ms(), start) > timeout:
+                return
+
             c = self.uart.read(1)
             if c == None:
                 continue
             c = c[0]
+
             if self.header == 2:
                 if self._read_frame(c):
                     return
@@ -152,10 +157,10 @@ class GY33_UART:
         self._write_cmd(0xA5, 0xBB)
 
     def set_i2c_addr(self, addr):
-        if addr >= 0 and addr <= 255:
+        if addr >= 0 and addr <= 127:
             self._write_cmd(0xAA, addr)
         else:
-            raise ValueError('addr must be between 0 to 255')
+            raise ValueError('addr must be between 0 to 127')
 
     def integration_time(self, time):
         if time == 700:
