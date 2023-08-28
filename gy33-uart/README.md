@@ -16,13 +16,13 @@ For details of the GY-33 I2C protocol, refer to this https://github.com/QuirkyCo
 
 ## Constructor
 
-`class gy33_uart.GY33_UART(uart)`
+### class gy33_uart.GY33_UART(uart)
 
 * uart: A uart object
 
 ## Methods
 
-`GY33_UART.read(wait=False, timeout=1000)`
+### GY33_UART.read(wait=False, timeout=1000)
 
 Reads from the uart, parse the messages, and store the results.
 This method does not return any values; you'll need to use the corresponding "get" methods to retrieve them.
@@ -30,7 +30,7 @@ This method does not return any values; you'll need to use the corresponding "ge
 * wait: If True, the method will block until it successfully reads a single message or timeout is reached.
 * timeout: Timeout in milliseconds. Only used if wait is True.
 
-`GY33_UART.set_output(raw, lcc, processed)`
+### GY33_UART.set_output(raw, lcc, processed)
 
 Sets the values that the GY-33 will continuously output.
 
@@ -42,7 +42,7 @@ Note that you will still need to perform a "read" and a "get" to retrieve the va
 
 This setting will persist across a power cycle.
 
-`GY33_UART.set_led(pwr, save)`
+### GY33_UART.set_led(pwr, save)
 
 Sets the LED power (0 to 10).
 0 will turn the LED off, while 10 will turn it to max power.
@@ -50,41 +50,41 @@ Sets the LED power (0 to 10).
 * pwr: LED power. 0 to 10.
 * save: If True, the setting will persist across a power cycle.
 
-`GY33_UART.query_raw()`
+### GY33_UART.query_raw()
 
 Request for a single reading of the raw values.
 When continuously output is turned off, you can use this to trigger a single read.
 
 Note that you will still need to perform a "read" and a "get" to retrieve the values.
 
-`GY33_UART.query_lcc()`
+### GY33_UART.query_lcc()
 
 Request for a single reading of the lcc values.
 When continuously output is turned off, you can use this to trigger a single read.
 
 Note that you will still need to perform a "read" and a "get" to retrieve the values.
 
-`GY33_UART.query_processed()`
+### GY33_UART.query_processed()
 
 Request for a single reading of the processed values.
 When continuously output is turned off, you can use this to trigger a single read.
 
 Note that you will still need to perform a "read" and a "get" to retrieve the values.
 
-`GY33_UART.query_i2c()`
+### GY33_UART.query_i2c()
 
 Request for a single reading of the i2c address (...for use in I2C mode).
 This value is never sent automatically, so you must send a query to obtain the i2c address.
 
 Note that you will still need to perform a "read" and a "get" to retrieve the values.
 
-`GY33_UART.set_baudrate(rate)`
+### GY33_UART.set_baudrate(rate)
 
 Sets the baudrate.
 
 * rate: Must be either 9600 or 115200.
 
-`GY33_UART.calibrate_white_balance()`
+### GY33_UART.calibrate_white_balance()
 
 Performs a white balance calibration.
 The sensor should first be placed on a suitable white surface.
@@ -92,13 +92,13 @@ The sensor should first be placed on a suitable white surface.
 This is handled by the built-in micro-controller affects the processed RGB values.
 The built-in microcontroller does not provide a black calibration.
 
-`GY33_UART.set_i2c_addr(addr)`
+### GY33_UART.set_i2c_addr(addr)
 
 Sets the i2c address (...for use in I2C mode).
 
 * addr: Desired i2c address. Must be between 0 to 127.
 
-`GY33_UART.integration_time(time)`
+### GY33_UART.integration_time(time)
 
 Sets the integration time in milliseconds.
 A higher integration time will provide a higher resolution for the raw values, but at the expense of a lower update rate.
@@ -106,25 +106,25 @@ A higher integration time will provide a higher resolution for the raw values, b
 * time: Integration time in milliseconds. (Valid values are 700, 154, 100 (default), 24, or 2.4).
 
 
-`GY33_UART.calibrate_white()`
+### GY33_UART.calibrate_white()
 
 Performs white calibration.
 The sensor should first be placed on a suitable white surface.
 
 After calibration, the same surface should return 255 for all RGBC values when performing a "get_calibrated()".
 
-`GY33_UART.calibrate_black()`
+### GY33_UART.calibrate_black()
 
 Performs black calibration.
 The sensor should first be placed on a suitable black surface.
 
 After calibration, the same surface should return 0 for all RGBC values when performing a "get_calibrated()".
 
-`GY33_UART.get_raw()`
+### GY33_UART.get_raw()
 
 Returns a list containing the raw "Red, Green, Blue, Clear" values.
 
-`GY33_UART.get_lcc()`
+### GY33_UART.get_lcc()
 
 Returns a list containing the "Lux (brightness), Color Temperature, Color" values.
 
@@ -141,10 +141,63 @@ The "Color" value should be interpreted as follows:
 | 1 | Yellow |
 | 0 | Red |
 
-`GY33_UART.get_processed()`
+### GY33_UART.get_processed()
 
 Returns a list containing the processed "Red, Green, Blue" values.
 
-`GY33_UART.get_i2c_addr()`
+### GY33_UART.get_i2c_addr()
 
 Sets the i2c address as an integer (...for use in I2C mode).
+
+## Examples
+
+This first example uses continous output.
+
+```python
+import machine
+import gy33_uart
+import time
+
+p0 = Pin(0, Pin.IN, Pin.PULL_UP)
+
+uart = machine.UART(1, baudrate=9600, tx=4, rx=5)
+gy33 = gy33_uart.GY33_UART(uart)
+
+gy33.set_led(10) # Full power
+gy33.set_output(True, False, True) # Continuously output raw and processed RGB values
+
+while True:
+    gy33.read()
+    if p0.value() == 0:
+        print(gy33.get_raw())
+        print(gy33.get_processed())
+        time.sleep(1)
+```
+
+The second example disables continuous output and sends a query when required.
+
+```python
+import machine
+import gy33_uart
+import time
+
+p0 = Pin(0, Pin.IN, Pin.PULL_UP)
+
+uart = machine.UART(1, baudrate=9600, tx=4, rx=5)
+gy33 = gy33_uart.GY33_UART(uart)
+
+gy33.set_led(10) # Full power
+gy33.set_output(False, False, False) # Disables all continuously outputs
+
+while True:
+    if p0.value() == 0:
+        gy33.query_raw()
+        gy33.read(True)
+
+        gy33.query_processed()
+        gy33.read(True)
+
+        print(gy33.get_raw())
+        print(gy33.get_processed())
+        time.sleep(1)
+```

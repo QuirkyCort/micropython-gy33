@@ -14,7 +14,7 @@ class GY33_I2C:
         ]
 
     # From 0 (off) to 10 (max)
-    def set_led_power(self, pwr=0):
+    def set_led(self, pwr=0):
         cfg = 0xA0 - pwr * 16
         self.i2c.writeto_mem(self.addr, 0x10, bytes([cfg]))
 
@@ -34,7 +34,7 @@ class GY33_I2C:
         return struct.unpack('>HHHH', data)
 
     # Returns calibrated Red, Green, Blue, Clear
-    def read_cal(self):
+    def read_calibrated(self):
         data = self.i2c.readfrom_mem(self.addr, 0x00, 8)
         color = struct.unpack('>HHHH', data)
         result = [0,0,0,0]
