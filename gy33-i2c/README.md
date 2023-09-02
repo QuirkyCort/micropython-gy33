@@ -1,7 +1,7 @@
 # I2C Mode
 
 I2C mode is enabled when S0 is connected to ground.
-I2C communication is via pin 2 and 3 (CT and DR).
+I2C communication is via pin 2 (CT/SCL) and 3 (DR/SDA).
 
 For details of the GY-33 I2C protocol, refer to this https://github.com/QuirkyCort/micropython-gy33/blob/main/gy33-i2c/gy33_i2c_protocol.md
 

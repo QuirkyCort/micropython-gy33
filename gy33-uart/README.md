@@ -1,7 +1,7 @@
 # UART Mode
 
 UART mode is enabled when S0 is unconnected or high.
-UART communication is via pin 2 and 3 (CT and DR).
+UART communication is via pin 2 (CT/TX) and 3 (DR/RX).
 
 For details of the GY-33 I2C protocol, refer to this https://github.com/QuirkyCort/micropython-gy33/blob/main/gy33-uart/gy33_uart_protocol.md
 
