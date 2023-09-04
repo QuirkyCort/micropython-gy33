@@ -22,7 +22,7 @@ For details of the GY-33 I2C protocol, refer to this https://github.com/QuirkyCo
 
 ## Methods
 
-### GY33_UART.read(wait=False, timeout=1000)
+### GY33_UART.update(wait=False, timeout=1000)
 
 Reads from the uart, parse the messages, and store the results.
 This method does not return any values; you'll need to use the corresponding "get" methods to retrieve them.
@@ -49,6 +49,26 @@ Sets the LED power (0 to 10).
 
 * pwr: LED power. 0 to 10.
 * save: If True, the setting will persist across a power cycle.
+
+### GY33_UART.set_integration_time(time)
+
+Sets the integration time in milliseconds.
+A higher integration time will provide a higher resolution for the raw values, but at the expense of a lower update rate.
+This setting will persist across a power cycle.
+
+* time: Integration time in milliseconds. (Valid values are 700, 154, 100 (default), 24, or 2.4).
+
+### GY33_UART.set_baudrate(rate)
+
+Sets the baudrate.
+
+* rate: Must be either 9600 or 115200.
+
+### GY33_UART.set_i2c_addr(addr)
+
+Sets the i2c address (...for use in I2C mode).
+
+* addr: Desired i2c address. Must be between 0 to 127.
 
 ### GY33_UART.query_raw()
 
@@ -78,12 +98,6 @@ This value is never sent automatically, so you must send a query to obtain the i
 
 Note that you will still need to perform a "read" and a "get" to retrieve the values.
 
-### GY33_UART.set_baudrate(rate)
-
-Sets the baudrate.
-
-* rate: Must be either 9600 or 115200.
-
 ### GY33_UART.calibrate_white_balance()
 
 Performs a white balance calibration.
@@ -91,20 +105,6 @@ The sensor should first be placed on a suitable white surface.
 
 This is handled by the built-in micro-controller affects the processed RGB values.
 The built-in microcontroller does not provide a black calibration.
-
-### GY33_UART.set_i2c_addr(addr)
-
-Sets the i2c address (...for use in I2C mode).
-
-* addr: Desired i2c address. Must be between 0 to 127.
-
-### GY33_UART.integration_time(time)
-
-Sets the integration time in milliseconds.
-A higher integration time will provide a higher resolution for the raw values, but at the expense of a lower update rate.
-
-* time: Integration time in milliseconds. (Valid values are 700, 154, 100 (default), 24, or 2.4).
-
 
 ### GY33_UART.calibrate_white()
 
@@ -119,6 +119,13 @@ Performs black calibration.
 The sensor should first be placed on a suitable black surface.
 
 After calibration, the same surface should return 0 for all RGBC values when performing a "get_calibrated()".
+
+### GY33_UART.get_calibrated()
+
+Returns a tuple containing only the calibrated Red, Green, Blue, and Clear values.
+Calibrated values are norminally between 0 to 255, but if exposed to light level that exceeds the calibration, it may return values beyond 0 to 255.
+
+These uses calibration values stored in the gy33 object, and are not the same as the values obtained from "get_processed()" (...which uses calibration stored in the sensor module).
 
 ### GY33_UART.get_raw()
 
