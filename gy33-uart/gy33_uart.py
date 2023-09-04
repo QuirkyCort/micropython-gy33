@@ -29,7 +29,7 @@ class GY33_UART:
             [439, 5838]
         ]
 
-    def read(self, wait=False, timeout=1000):
+    def update(self, wait=False, timeout=1000):
         start = time.ticks_ms()
         while self.uart.any() or wait:
             if wait and time.ticks_diff(time.ticks_ms(), start) > timeout:
@@ -125,6 +125,7 @@ class GY33_UART:
             cmd |= 1
 
         self._write_cmd(0xA5, cmd)
+        time.sleep_ms(100)
 
     def set_led(self, pwr=0, save=False):
         cmd = 0x60 + 0x0A - pwr
@@ -132,6 +133,7 @@ class GY33_UART:
 
         if save:
             self._write_cmd(0xA5, 0xCC)
+        time.sleep_ms(100)
 
     def query_raw(self):
         self._write_cmd(0xA5, 0x51)
@@ -162,19 +164,20 @@ class GY33_UART:
         else:
             raise ValueError('addr must be between 0 to 127')
 
-    def integration_time(self, time):
-        if time == 700:
+    def set_integration_time(self, itime):
+        if itime == 700:
             self._write_cmd(0xA5, 0x58)
-        elif time == 154:
+        elif itime == 154:
             self._write_cmd(0xA5, 0x59)
-        elif time == 100:
+        elif itime == 100:
             self._write_cmd(0xA5, 0x5A)
-        elif time == 24:
+        elif itime == 24:
             self._write_cmd(0xA5, 0x5B)
-        elif time == 2.4:
+        elif itime == 2.4:
             self._write_cmd(0xA5, 0x5C)
         else:
             raise ValueError('time must be 700, 154, 100, 24, or 2.4')
+        time.sleep_ms(100)
 
     def calibrate_white(self):
         for i in range(4):
@@ -196,7 +199,7 @@ class GY33_UART:
     def get_calibrated(self):
         cal = [0, 0, 0, 0]
         for i in range(4):
-            cal[i] = 55 * (self.raw[i] - self.cal[i][0]) // (self.cal[i][1] - self.cal[i][0])
+            cal[i] = 255 * (self.raw[i] - self.cal[i][0]) // (self.cal[i][1] - self.cal[i][0])
         return cal
 
     def get_i2c_addr(self):
