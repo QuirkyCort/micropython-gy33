@@ -123,6 +123,7 @@ After calibration, the same surface should return 0 for all RGBC values when per
 ### GY33_UART.get_calibrated()
 
 Returns a tuple containing only the calibrated Red, Green, Blue, and Clear values.
+You must perform an "update()" first.
 Calibrated values are norminally between 0 to 255, but if exposed to light level that exceeds the calibration, it may return values beyond 0 to 255.
 
 These uses calibration values stored in the gy33 object, and are not the same as the values obtained from "get_processed()" (...which uses calibration stored in the sensor module).
@@ -130,10 +131,12 @@ These uses calibration values stored in the gy33 object, and are not the same as
 ### GY33_UART.get_raw()
 
 Returns a list containing the raw "Red, Green, Blue, Clear" values.
+You must perform an "update()" first.
 
 ### GY33_UART.get_lcc()
 
 Returns a list containing the "Lux (brightness), Color Temperature, Color" values.
+You must perform an "update()" first.
 
 The "Color" value should be interpreted as follows:
 
@@ -151,10 +154,14 @@ The "Color" value should be interpreted as follows:
 ### GY33_UART.get_processed()
 
 Returns a list containing the processed "Red, Green, Blue" values.
+You must perform an "update()" first.
 
 ### GY33_UART.get_i2c_addr()
 
 Sets the i2c address as an integer (...for use in I2C mode).
+You must perform an "update()" first.
+
+The GY33 will not automatically send out the I2C address; you must perform a query_i2c(), followed by an update() to obtain the address.
 
 ## Examples
 
@@ -174,7 +181,7 @@ gy33.set_led(10) # Full power
 gy33.set_output(True, False, True) # Continuously output raw and processed RGB values
 
 while True:
-    gy33.read()
+    gy33.update()
     if p0.value() == 0:
         print(gy33.get_raw())
         print(gy33.get_processed())
@@ -199,10 +206,10 @@ gy33.set_output(False, False, False) # Disables all continuously outputs
 while True:
     if p0.value() == 0:
         gy33.query_raw()
-        gy33.read(True)
+        gy33.update(True)
 
         gy33.query_processed()
-        gy33.read(True)
+        gy33.update(True)
 
         print(gy33.get_raw())
         print(gy33.get_processed())
