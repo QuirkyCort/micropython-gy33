@@ -87,9 +87,9 @@ import time
 i2c = machine.I2C(0, freq=100000)
 gy33 = gy33_i2c.GY33_I2C(i2c, addr=90)
 
-gy33.set_led_power(10) # Full power
+gy33.set_led(10) # Full power
 
 while True:
-    print(gy33.read_cal())
+    print(gy33.read_calibrated())
     time.sleep(1)
 ```
