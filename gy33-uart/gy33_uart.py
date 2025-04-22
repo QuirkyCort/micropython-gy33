@@ -42,7 +42,7 @@ class GY33_UART:
 
             if self.header == 2:
                 if self._read_frame(c):
-                    return
+                    return True
             elif c == HEADER:
                 self._clear_frame()
                 self.header += 1
